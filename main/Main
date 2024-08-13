@@ -1,0 +1,263 @@
+-- Wait for the game to load fully
+wait(3)
+
+-- Get services
+local players = game:GetService("Players")
+local starterGui = game:GetService("StarterGui")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Send notifications to the player
+starterGui:SetCore("SendNotification", {
+    Title = "AngelLightv1";
+    Text = "Welcome To AngelLightv1 Made By Kiyokaw, " .. players.LocalPlayer.DisplayName;
+    Icon = "rbxthumb://type=AvatarHeadShot&id=" .. players.LocalPlayer.UserId .. "&w=180&h=180";
+    Duration = 3
+})
+
+wait(3)
+
+starterGui:SetCore("SendNotification", {
+    Title = "AngelLightv1";
+    Text = "Your Script Will Load Shortly!";
+    Icon = "rbxthumb://type=AvatarHeadShot&id=" .. players.LocalPlayer.UserId .. "&w=180&h=180";
+    Duration = 3
+})
+
+wait(3)
+
+warn("[DEBUG] LOADING MURDER MYSTERY 2 UNHASHER V-1")
+
+-- Create hashTable to store remote references
+local hashTable = {}
+for _, v in pairs(getgc()) do
+    if type(v) == "function" and debug.getinfo(v).name == "get_remote_from_cache" then
+        wait(0.5)
+        local info = debug.getinfo(v)
+        local upvalues = debug.getupvalues(v)
+        local functionName = info.name
+
+        if next(upvalues) ~= nil and type(upvalues[1]) == "table" then
+            local remoteTable = upvalues[1]
+            hashTable[functionName] = {}
+            for key, value in pairs(remoteTable) do
+                hashTable[functionName][key] = value
+            end
+        end
+    end
+end
+
+local remotes = {}
+local hashes = {}
+for functionName, tableContents in pairs(hashTable) do
+    for key, value in pairs(tableContents) do
+        remotes[value] = key
+        hashes[key] = value
+    end
+end
+
+local apiFolder = replicatedStorage:FindFirstChild("API")
+if apiFolder then
+    for _, remoteTable in pairs(apiFolder:GetDescendants()) do
+        if remoteTable:IsA("RemoteEvent") or remoteTable:IsA("RemoteFunction") then
+            local originalName = remotes[remoteTable]
+            if originalName then
+                remoteTable.Name = originalName
+            end
+        end
+    end
+end
+
+warn("Loaded")
+
+-- Create advanced GUI
+local GUI = Instance.new("ScreenGui")
+GUI.Name = "AngelLightv1"
+GUI.Parent = game.CoreGui
+
+-- Create Main Frame
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 350, 0, 500)
+Frame.Position = UDim2.new(0.5, -175, 0.5, -250)
+Frame.BackgroundTransparency = 0.1
+Frame.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+Frame.BorderSizePixel = 0
+Frame.BorderColor3 = Color3.new(0.2, 0.2, 0.2)
+Frame.Parent = GUI
+
+-- Add rounded corners to Frame
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = Frame
+
+-- Title Bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.Position = UDim2.new(0, 0, 0, 0)
+TitleBar.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1) -- Darker black
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = Frame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0.8, 0, 1, 0)
+Title.Position = UDim2.new(0.1, 0, 0, 0)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.Text = "AngelLightv1"
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Parent = TitleBar
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0.1, 0, 1, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 18
+CloseButton.Text = "X"
+CloseButton.BackgroundTransparency = 0.3
+CloseButton.BackgroundColor3 = Color3.new(1, 0, 0)
+CloseButton.BorderSizePixel = 0
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.Parent = TitleBar
+
+local UICornerClose = Instance.new("UICorner")
+UICornerClose.CornerRadius = UDim.new(0, 10)
+UICornerClose.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    GUI:Destroy()
+end)
+
+-- Draggable functionality
+local dragging = false
+local dragInput, dragStart, startPos
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Main Content
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, 0, 1, -40)
+Content.Position = UDim2.new(0, 0, 0, 40)
+Content.BackgroundTransparency = 0.2
+Content.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) -- Dark gray background for content
+Content.BorderSizePixel = 0
+Content.Parent = Frame
+
+-- Buttons
+local function createButton(name, color, position, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.9, 0, 0, 40)
+    button.Position = position
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 18
+    button.Text = name
+    button.BackgroundTransparency = 0.6
+    button.BackgroundColor3 = color
+    button.BorderSizePixel = 1
+    button.BorderColor3 = Color3.new(0.1, 0.1, 0.1)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Parent = Content
+
+    local UICornerButton = Instance.new("UICorner")
+    UICornerButton.CornerRadius = UDim.new(0, 10)
+    UICornerButton.Parent = button
+
+    button.MouseButton1Click:Connect(callback)
+
+    return button
+end
+
+-- Create Buttons with spacing
+local buttonSpacing = 0.05
+local buttonHeight = 0.1
+
+local freezeTradeButton = createButton("FREEZE TRADE", Color3.new(0.1, 0.1, 0.1), UDim2.new(0.05, 0, 0.05, 0), function()
+    -- Implement freeze trade functionality
+    print("Freeze trade clicked")
+end)
+
+local hideGodliesButton = createButton("HIDE GODLIES", Color3.new(0.1, 0.1, 0.1), UDim2.new(0.05, 0, 0.05 + buttonHeight + buttonSpacing, 0), function()
+    -- Implement hide godlies functionality
+    print("Hide godlies clicked")
+end)
+
+local forceAcceptButton = createButton("FORCE ACCEPT", Color3.new(0.1, 0.1, 0.1), UDim2.new(0.05, 0, 0.05 + 2 * (buttonHeight + buttonSpacing), 0), function()
+    -- Implement force accept functionality
+    print("Force accept clicked")
+end)
+
+local copyDiscordButton = createButton("COPY DISCORD", Color3.new(0.1, 0.1, 0.1), UDim2.new(0.05, 0, 0.05 + 3 * (buttonHeight + buttonSpacing), 0), function()
+    -- Display text box with Discord link
+    local textBox = Instance.new("TextBox")
+    textBox.Size = UDim2.new(0.9, 0, 0, 40)
+    textBox.Position = UDim2.new(0.05, 0, 0.05 + 4 * (buttonHeight + buttonSpacing), 0)
+    textBox.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    textBox.BorderSizePixel = 1
+    textBox.BorderColor3 = Color3.new(0.2, 0.2, 0.2)
+    textBox.TextColor3 = Color3.new(1, 1, 1)
+    textBox.TextSize = 14
+    textBox.Text = "discord.gg/eRVX2Qa3zc"
+    textBox.ClearTextOnFocus = false
+    textBox.Parent = Content
+    textBox.TextEditable = false -- Make text box non-editable
+
+    -- Optional: Add a label or visual cue for copying instructions
+    local copyInstructions = Instance.new("TextLabel")
+    copyInstructions.Size = UDim2.new(1, 0, 0, 20)
+    copyInstructions.Position = UDim2.new(0, 0, 0.05 + 5 * (buttonHeight + buttonSpacing), 0) -- Increased spacing
+    copyInstructions.BackgroundTransparency = 1
+    copyInstructions.Text = "Click the text above to copy the link."
+    copyInstructions.TextColor3 = Color3.new(1, 1, 1)
+    copyInstructions.TextSize = 12
+    copyInstructions.TextXAlignment = Enum.TextXAlignment.Center
+    copyInstructions.Parent = Content
+end)
+
+-- Descriptions
+local Description1 = Instance.new("TextLabel")
+Description1.Size = UDim2.new(1, 0, 0, 40)
+Description1.Position = UDim2.new(0, 0, 1, -80)
+Description1.Font = Enum.Font.Gotham
+Description1.TextSize = 14
+Description1.Text = "AngelLightv1 by Kiyokaw on YouTube. Any other versions are not official."
+Description1.TextWrapped = true
+Description1.BackgroundTransparency = 1
+Description1.TextColor3 = Color3.new(1, 1, 1)
+Description1.Parent = Content
+
+local Description2 = Instance.new("TextLabel")
+Description2.Size = UDim2.new(1, 0, 0, 40)
+Description2.Position = UDim2.new(0, 0, 1, -40)
+Description2.Font = Enum.Font.Gotham
+Description2.TextSize = 14
+Description2.Text = "JOIN DISCORD FOR MORE SCRIPTS LINK discord.gg/eRVX2Qa3zc"
+Description2.TextWrapped = true
+Description2.BackgroundTransparency = 1
+Description2.TextColor3 = Color3.new(1, 1, 1)
+Description2.Parent = Content
+
+-- Final touches
+Content.ClipsDescendants = true
